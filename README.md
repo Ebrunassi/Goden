@@ -1,2 +1,2 @@
 # Goden
-Dungeons and Dragons API
+Dungeons and Dragons and Battle API
