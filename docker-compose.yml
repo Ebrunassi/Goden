@@ -1,0 +1,60 @@
+version: "3.3"
+
+services:
+  traefik:
+    image: "traefik:1.7.2-alpine"
+    container_name: "traefik"
+    restart: unless-stopped    
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    labels:
+      - traefik.frontend.rule=Host:monitor.localhost
+      - traefik.port=8080    
+      # - traefik.docker.network=no_https_web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/evandro/Traefik/Example/traefik.toml:/traefik.toml
+      - /home/evandro/Traefik/Example/acme.json:/acme.json      
+    networks:
+      - no_https_web
+
+  nriskweb-login:
+    image: nriskweb-login:1.0
+    restart: unless-stopped
+    labels:
+      - traefik.backend=login
+      - traefik.frontend.rule=Host:login.localhost
+      - traefik.docker.network=no_https_web
+      - traefik.port=8080
+      - traefik.enable=true
+      # - traefik.basic.protocol=https
+    volumes:
+      - /home/evandro/nriskweb-docker/login:/logs
+    networks:    
+      - no_https_web
+    depends_on:
+      - traefik
+
+  nriskweb-consulta:
+    image: nriskweb-consulta:1.0
+    restart: unless-stopped
+    labels:
+      - traefik.backend=consulta
+      - traefik.frontend.rule=Host:consulta.localhost
+      - traefik.docker.network=no_https_web
+      - traefik.port=8080
+      - traefik.enable=true
+    volumes:
+      - /home/evandro/nriskweb-docker/consulta:/logs
+    networks:    
+      - no_https_web
+    depends_on:
+      - traefik
+      - nriskweb-login
+
+
+networks:
+  no_https_web:
+    external: true
