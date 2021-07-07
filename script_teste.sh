@@ -1,3 +1,6 @@
 echo "Iniciando script..."
-cp GERADOS/target/goden-0.0.1-SNAPSHOT.jar /home/evandro/Documentos/SUCESSO/
+echo "Criando imagem"
+docker build -t goden:1.0.0 .
+echo "Imagem criada"
+docker save -o goden.tar goden:1.0.0
 echo "Finalizado!"
